@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-_qcyw$_xba7j3h7!16g@bb)hs&=k$jc_0fza)wz6c#okpc0e3h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['careerforge-agent-production.up.railway.app', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -130,6 +130,8 @@ STATIC_URL = 'static/'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://careerforge-agent.vercel.app',
+    'https://careerforge-agent-sinan-mansoors-projects.vercel.app',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False  # Keep False in production
