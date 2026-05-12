@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import './index.css';
 
-const API_BASE = 'careerforge-agent-production.up.railway.app';
+const API_BASE = 'https://careerforge-agent-production.up.railway.app/api';
 
 const App = () => {
   // --- WIZARD STATES ---
