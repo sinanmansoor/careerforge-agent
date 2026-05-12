@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+
+:root {
+  --bg-color: #030303;
+  --card-bg: #0a0a0a;
+  --primary-color: #00f2ff;
+  --primary-hover: #00d1db;
+  --accent-blue: #6c63ff;
+  --text-main: #ffffff;
+  --text-dim: #888888;
+  --accent-glow: rgba(0, 242, 255, 0.1);
+  --border-color: #1a1a1a;
+  --success: #00ff9d;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  background-image: radial-gradient(circle at 50% 50%, #111 0%, #030303 100%);
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  position: relative;
+  transition: border-color 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: #333;
+}
+
+input, textarea {
+  width: 100%;
+  background: #050505;
+  border: 1px solid #222;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background: #080808;
+}
+
+button {
+  background: var(--primary-color);
+  color: #000;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+button:hover {
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+}
+
+.result-box {
+  background: #050505;
+  border: 1px solid #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+  color: #ddd;
+  line-height: 1.7;
+}
+
+.result-box strong {
+  color: var(--primary-color);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #fff 0%, var(--primary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+

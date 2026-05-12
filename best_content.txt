@@ -1,0 +1,2 @@
+"      {/* Module Navigation Tabs */}\n      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>\n        {[\n          { id: 'discovery', label: '1. Discovery', icon: <Search size={16} /> },\n  
+<truncated 12649 bytes>
