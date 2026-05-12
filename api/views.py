@@ -76,22 +76,36 @@ def retrieve_context(query_type, query_data):
             role = query_data.get('role', '')
             company = query_data.get('company', '')
             
-            # ELITE CURATED LIBRARY (Ensures 100% Playability)
-            ELITE_VIDEOS = [
-                {"topic": "System Design Masterclass", "video_id": "i53Gi_K397I", "summary": "Deep dive into scalability and architecture."},
-                {"topic": "High-Level Architecture", "video_id": "vJvT1BPyIUA", "summary": "Understanding modern backend scaling."},
-                {"topic": "Coding Interview Patterns", "video_id": "0IAPZzGSbME", "summary": "The 14 patterns to ace any coding interview."},
-                {"topic": "Front-End Performance", "video_id": "0fONene3nIA", "summary": "Optimizing critical rendering paths."}
-            ]
+            # VERIFIED CURATED LIBRARY (High availability for embedding)
+            ELITE_VIDEOS = {
+                "Software Engineer": [
+                    {"topic": "System Design for Beginners", "video_id": "SqcXvc34GSM", "summary": "Full course on scaling systems."},
+                    {"topic": "Backend Engineering Guide", "video_id": "6S_99fB-Lxs", "summary": "Mastering servers and databases."}
+                ],
+                "Data Scientist": [
+                    {"topic": "Machine Learning Masterclass", "video_id": "GwIo3gDZUtQ", "summary": "End-to-end ML pipeline tutorial."},
+                    {"topic": "Data Science Roadmap", "video_id": "ua-CiDNNj30", "summary": "Comprehensive guide to 2026 data science."}
+                ],
+                "Frontend Developer": [
+                    {"topic": "Advanced React Patterns", "video_id": "m_u6P5k0vP0", "summary": "Optimizing front-end architecture."},
+                    {"topic": "Next.js 15 Full Course", "video_id": "wm5gMKuwSYk", "summary": "Modern web development at scale."}
+                ],
+                "Generic": [
+                    {"topic": "The 14 Coding Patterns", "video_id": "0IAPZzGSbME", "summary": "Mastering the logic behind technical interviews."}
+                ]
+            }
 
             
-            query = f'site:youtube.com "{company}" "{role}" interview technical 2026'
-            results = list(ddgs.text(query, max_results=10))
+            query = f'site:youtube.com "{role}" technical roadmap 2026'
+            results = list(ddgs.text(query, max_results=5))
             context_str += f"CURATED & SEARCHED VIDEOS FOR {role}:\n"
             
-            for vid in ELITE_VIDEOS:
-                context_str += f"- Topic: {vid['topic']}\n  Video ID: {vid['video_id']}\n\n"
+            # Add role-specific curated videos
+            role_vids = ELITE_VIDEOS.get(role, ELITE_VIDEOS["Generic"])
+            for vid in role_vids:
+                context_str += f"- Topic: {vid['topic']}\n  Video ID: {vid['video_id']}\n  Summary: {vid['summary']}\n\n"
             
+            # Add live search results
             for r in results:
                 url = r.get('href', '')
                 match = re.search(r'(?:v=|be\/|embed\/)([0-9A-Za-z_-]{11})', url)

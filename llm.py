@@ -32,7 +32,7 @@ def get_assessment_questions(context=""):
     Return JSON:
     {{
       "questions": [
-        {{ "id": {random.randint(1,1000)}, "question": "...", "options": {{"A": "...", "B": "...", "C": "..."}} }}
+        {{ "id": {random.randint(1,1000)}, "question": "...", "options": ["Choice A", "Choice B", "Choice C"] }}
       ]
     }}
     """
@@ -91,7 +91,8 @@ def get_interview_prep(role, company="", context=""):
     Company: {company}
     Market Context: {context}
     
-    Task: Select ONLY THE SINGLE MOST RELEVANT YouTube video for this specific role and company.
+    Task: Select ONLY THE SINGLE MOST RELEVANT YouTube video for this specific role: "{role}" from the context provided.
+    If the user is a Frontend Developer, prioritize Frontend videos. If a Data Scientist, prioritize ML videos.
     Provide a hyper-detailed summary and precisely 5 high-impact key takeaways.
     
     Return JSON:
@@ -108,7 +109,7 @@ def get_interview_prep(role, company="", context=""):
     }}
     
     CRITICAL: RETURN EXACTLY ONE VIDEO OBJECT IN THE LIST.
-    Extract the 'video_id' accurately from the provided context. If context is empty, use 'i53Gi_K397I'.
+    Extract the 'video_id' accurately from the provided context. 
     """
     return ask(prompt, is_json=True)
 
@@ -150,11 +151,12 @@ def get_technical_quiz(role):
         {{
           "id": {random.randint(1,1000)},
           "question": "...",
-          "options": {{"A": "...", "B": "...", "C": "..."}},
-          "correct_answer": "A"
+          "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+          "correct": "Option 1" 
         }}
       ]
     }}
+    CRITICAL: The "correct" field MUST be the EXACT string from the "options" array.
     """
     return ask(prompt, is_json=True)
 
@@ -264,8 +266,8 @@ def agent_chat(history, user_state):
             response_data["artifact_data"] = {"problem": problem}
             
         elif action == "QUIZ":
-            quiz = json.loads(get_technical_quiz(role))
-            response_data["artifact_data"] = {"questions": quiz}
+            quiz_data = json.loads(get_technical_quiz(role))
+            response_data["artifact_data"] = {"questions": quiz_data.get("questions", [])}
             
         elif action == "PROJECT":
             project = get_project_idea(role, "", "")

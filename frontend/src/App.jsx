@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Rocket, ChevronRight, Brain, Lightbulb, FileText, Download, RefreshCcw, Loader2, CheckCircle2, Gamepad2, Target, Video, Search, Code2, ExternalLink, ArrowLeft, BriefcaseBusiness, Award, Send, MessageSquare, Camera, ShieldAlert, Users
+  Rocket, ChevronRight, Brain, Lightbulb, FileText, Download, RefreshCcw, Loader2, CheckCircle2, Gamepad2, Target, Video, Search, Code2, ExternalLink, ArrowLeft, BriefcaseBusiness, Award, Send, MessageSquare, Camera, ShieldAlert, Users, ShieldCheck
 } from 'lucide-react';
 import './index.css';
 
@@ -137,13 +137,30 @@ const App = () => {
     setLoadingMsg('Generating Technical Assessment...');
     try {
       const res = await axios.post(`${API_BASE}/technical-quiz/`, { role: results.chosenRole });
-      const questions = res.data.questions || res.data.quiz || [];
-      setQuiz({ ...quiz, questions, active: true, currentIdx: 0, score: 0, showResults: false });
+      const qData = res.data.questions || res.data.quiz || [];
+      setQuiz({ active: true, questions: qData, currentIdx: 0, score: 0, showResults: false, answers: {} });
     } catch (err) {
       alert('Error generating quiz.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleQuizAnswer = (option) => {
+    const currentQ = quiz.questions[quiz.currentIdx];
+    // Normalize comparison: trim and lower case
+    const userAns = String(option).trim().toLowerCase();
+    const correctAns = String(currentQ.correct || currentQ.correct_answer || "").trim().toLowerCase();
+    
+    const isCorrect = userAns === correctAns;
+    
+    setQuiz(prev => ({
+      ...prev,
+      score: isCorrect ? prev.score + 1 : prev.score,
+      answers: { ...prev.answers, [prev.currentIdx]: option },
+      currentIdx: prev.currentIdx + 1 === prev.questions.length ? prev.currentIdx : prev.currentIdx + 1,
+      showResults: prev.currentIdx + 1 === prev.questions.length
+    }));
   };
 
   const getNewProblem = async () => {
@@ -207,7 +224,7 @@ const App = () => {
         setResults(prev => ({ ...prev, projectIdea: data.artifact_data.project }));
         setStep(4);
       } else if (data.action === 'QUIZ' && data.artifact_data) {
-        setQuiz({ active: true, questions: data.artifact_data.questions, currentIdx: 0, score: 0, showResults: false });
+        setQuiz({ active: true, questions: data.artifact_data.questions, currentIdx: 0, score: 0, showResults: false, answers: {} });
       }
     } catch (err) {
       setChatMessages(prev => [...prev, { role: 'agent', content: 'Connection to orchestrator lost.' }]);
@@ -264,7 +281,7 @@ const App = () => {
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
           <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
             <Rocket style={{ verticalAlign: 'middle', marginRight: '10px' }} color="#6C63FF" />
-            CareerForge <span className="gradient-text">AI</span>
+            CareerForge <span className="gradient-text">Agent</span>
           </h1>
           <p style={{ color: 'var(--text-dim)', fontSize: '1.1rem' }}>Autonomous Agentic Pipeline for Proactive Builders.</p>
         </motion.div>
@@ -419,8 +436,8 @@ const App = () => {
           {step > 1 && (
             <div className="glass-card" style={{ padding: '1.5rem' }}>
               <h4 style={{ color: '#888', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Quick Actions</h4>
-              <button onClick={() => { getNewProblem(); setCodeLab({ ...codeLab, active: true }); }} style={{ width: '100%', marginBottom: '0.8rem', background: 'transparent', border: '1px solid #333', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Code2 size={16} color="var(--primary-color)" /> Open Code Lab</button>
-              {results.chosenRole && <button onClick={generateQuiz} style={{ width: '100%', marginBottom: '0.8rem', background: 'transparent', border: '1px solid #333', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Gamepad2 size={16} color="#0f0" /> Technical Assessment</button>}
+              <button onClick={() => { getNewProblem(); setCodeLab({ ...codeLab, active: true }); }} style={{ width: '100%', marginBottom: '0.8rem', background: 'transparent', border: '1px solid #333', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}><Code2 size={16} color="var(--primary-color)" /> Open Code Lab</button>
+              {results.chosenRole && <button onClick={generateQuiz} style={{ width: '100%', marginBottom: '0.8rem', background: 'transparent', border: '1px solid #333', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}><Gamepad2 size={16} color="#0f0" /> Technical Assessment</button>}
               <button onClick={() => startProctoredTest('Elite Corporate Client')} style={{ width: '100%', background: 'linear-gradient(90deg, #ff0055, #ffcc00)', color: 'black', border: 'none', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '900' }}><Camera size={16} /> Enter Proctored Exam</button>
             </div>
           )}
@@ -431,7 +448,15 @@ const App = () => {
       {codeLab.active && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.98)', zIndex: 3000, display: 'flex', flexDirection: 'column', padding: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h2 style={{ color: 'var(--primary-color)', margin: 0 }}><Code2 style={{ verticalAlign: 'middle', marginRight: '10px' }} /> Frontier Code Lab</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+              <h2 style={{ color: 'var(--primary-color)', margin: 0 }}><Code2 style={{ verticalAlign: 'middle', marginRight: '10px' }} /> Frontier Code Lab</h2>
+              <select value={codeLab.language} onChange={e => setCodeLab({ ...codeLab, language: e.target.value })} style={{ background: '#111', color: 'var(--primary-color)', border: '1px solid #333', padding: '0.4rem 1rem', borderRadius: '4px', outline: 'none' }}>
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+              </select>
+            </div>
             <button onClick={() => setCodeLab({ ...codeLab, active: false })} style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
           </div>
 
@@ -525,9 +550,16 @@ const App = () => {
           )}
         </AnimatePresence>
 
-        <button onClick={() => setIsChatOpen(!isChatOpen)} style={{ width: '4rem', height: '4rem', borderRadius: '50%', background: 'linear-gradient(135deg, #6C63FF, #FF00E5)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 10px 25px rgba(108, 99, 255, 0.5)', transition: 'transform 0.2s ease' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-          {isChatOpen ? <span style={{ fontSize: '2rem', color: 'white' }}>×</span> : <MessageSquare size={28} color="white" />}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {!isChatOpen && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} style={{ background: '#111', color: 'var(--primary-color)', padding: '0.6rem 1.2rem', borderRadius: '2rem', fontSize: '0.8rem', fontWeight: '900', border: '1px solid var(--primary-color)', boxShadow: '0 0 20px rgba(0,242,255,0.2)', whiteSpace: 'nowrap' }}>
+              TALK TO AGENT →
+            </motion.div>
+          )}
+          <button onClick={() => setIsChatOpen(!isChatOpen)} style={{ width: '4rem', height: '4rem', borderRadius: '50%', background: 'linear-gradient(135deg, #6C63FF, #FF00E5)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 10px 25px rgba(108, 99, 255, 0.5)', transition: 'transform 0.2s ease' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+            {isChatOpen ? <span style={{ fontSize: '2rem', color: 'white' }}>×</span> : <MessageSquare size={28} color="white" />}
+          </button>
+        </div>
       </div>
 
       {/* PROCTORED TEST OVERLAY */}
@@ -542,7 +574,10 @@ const App = () => {
               <div style={{ color: '#555', fontSize: '0.8rem' }}>|</div>
               <div style={{ color: 'white', fontWeight: 'bold' }}>CLIENT_INVITATIONAL: {proctoredTest.company}</div>
             </div>
-            <button onClick={() => setProctoredTest({ ...proctoredTest, active: false })} style={{ background: 'transparent', border: 'none', color: '#444', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <button onClick={() => { if(window.confirm('Quit exam? Your progress will be lost.')) setProctoredTest({ ...proctoredTest, active: false }) }} style={{ background: 'transparent', border: '1px solid #ff0055', color: '#ff0055', padding: '0.4rem 1rem', fontSize: '0.7rem', fontWeight: 'bold', borderRadius: '4px' }}>QUIT EXAM</button>
+              <button onClick={() => setProctoredTest({ ...proctoredTest, active: false })} style={{ background: 'transparent', border: 'none', color: '#444', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            </div>
           </div>
 
           <div style={{ flex: 1, display: 'flex', gap: '1px', background: '#111' }}>
@@ -595,6 +630,45 @@ const App = () => {
                 <div style={{ fontSize: '0.7rem', color: '#555' }}>Complete this test with a score {'>'} 90% to trigger an automatic HR round invite.</div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* QUIZ OVERLAY */}
+      {quiz.active && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.98)', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '800px', position: 'relative' }}>
+            <button onClick={() => setQuiz({ ...quiz, active: false })} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent', border: 'none', color: '#888', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            
+            {!quiz.showResults ? (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                  <h2 style={{ color: 'var(--primary-color)', margin: 0 }}>Technical Assessment</h2>
+                  <span style={{ color: '#888' }}>Question {quiz.currentIdx + 1} of {quiz.questions.length}</span>
+                </div>
+                
+                <p style={{ fontSize: '1.4rem', marginBottom: '2.5rem', lineHeight: '1.4' }}>{quiz.questions[quiz.currentIdx]?.question}</p>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  {(Array.isArray(quiz.questions[quiz.currentIdx]?.options) 
+                    ? quiz.questions[quiz.currentIdx].options 
+                    : Object.values(quiz.questions[quiz.currentIdx]?.options || {})
+                  ).map((opt, i) => (
+                    <button key={i} onClick={() => handleQuizAnswer(opt)} style={{ background: '#0a0a0a', border: '1px solid #222', textAlign: 'left', textTransform: 'none', padding: '1.5rem', color: 'white' }}>
+                      <span style={{ color: 'var(--primary-color)', marginRight: '1rem' }}>{String.fromCharCode(65 + i)}.</span> {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <Award size={80} color="#ffcc00" style={{ marginBottom: '1.5rem' }} />
+                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Assessment Complete</h2>
+                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: 'var(--primary-color)', marginBottom: '1rem' }}>{Math.round((quiz.score / quiz.questions.length) * 100)}%</div>
+                <p style={{ color: '#888', marginBottom: '2rem' }}>You answered {quiz.score} out of {quiz.questions.length} questions correctly.</p>
+                <button onClick={() => setQuiz({ ...quiz, active: false })} style={{ background: 'var(--primary-color)', color: 'black' }}>Return to Workstation</button>
+              </div>
+            )}
           </div>
         </div>
       )}
