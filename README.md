@@ -1,7 +1,5 @@
 # CareerForge AI - Full Stack
 
-This project has been upgraded from a Streamlit app to a modern Full-Stack application.
-
 ## Structure
 - `/backend`: Django REST Framework API.
 - `/frontend`: React + Vite Frontend.
